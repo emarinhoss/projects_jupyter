@@ -60,8 +60,8 @@ class Dqn():
         self.last_reward = 0
     
     def select_action(self, state):
-        probs = F.softmax(self.model(Variable(state, volatile = True))*100) # T=100
-        action = probs.multinomial()
+        probs = F.softmax(self.model(Variable(state))*100) # T=100
+        action = probs.multinomial(3)
         return action.data[0,0]
     
     def learn(self, batch_state, batch_next_state, batch_reward, batch_action):
@@ -70,7 +70,7 @@ class Dqn():
         target = self.gamma*next_outputs + batch_reward
         td_loss = F.smooth_l1_loss(outputs, target)
         self.optimizer.zero_grad()
-        td_loss.backward(retain_variables = True)
+        td_loss.backward()
         self.optimizer.step()
     
     def update(self, reward, new_signal):
